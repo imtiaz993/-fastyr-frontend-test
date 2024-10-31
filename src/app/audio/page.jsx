@@ -1,66 +1,158 @@
-'use client'
+"use client";
 
-// pages/audio.js
-import { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from "react";
+import { Card } from "@/components/ui/card";
+import { useReactMediaRecorder } from "react-media-recorder";
+import { encode } from "base64-arraybuffer";
+import { Mic, StopCircle, Play, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DeleteRecordingModal } from "./components/delete-audio-modal";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 
-const AudioRecorder = () => {
-    const [isRecording, setIsRecording] = useState(false);
-    const [audioChunks, setAudioChunks] = useState([]);
-    const [audioURL, setAudioURL] = useState('');
-    const mediaRecorderRef = useRef(null);
+const AudioPage = () => {
+  const [recordings, setRecordings] = useState([]);
+  const [playingRecording, setPlayingRecording] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isOpenDeletePopup, setIsOpenDeletePopup] = useState(false);
+  const audioRef = useRef(null);
 
-    const startRecording = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorderRef.current = new MediaRecorder(stream);
+  const saveRecording = async (url) => {
+    if (url) {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const arrayBuffer = await blob.arrayBuffer();
+      const base64Audio = encode(arrayBuffer);
 
-            mediaRecorderRef.current.ondataavailable = (event) => {
-                setAudioChunks((prev) => [...prev, event.data]);
-            };
+      const newRecording = {
+        id: new Date().getTime(),
+        base64: base64Audio,
+      };
 
-            mediaRecorderRef.current.start();
-            setIsRecording(true);
-        } catch (error) {
-            console.error("Error starting recording:", error);
-        }
-    };
+      const updatedRecordings = [...recordings, newRecording];
+      setRecordings(updatedRecordings);
+      localStorage.setItem("recordings", JSON.stringify(updatedRecordings));
+      clearBlobUrl();
+    }
+  };
 
-    const stopRecording = () => {
-        mediaRecorderRef.current.stop();
-        mediaRecorderRef.current.onstop = () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const audioURL = URL.createObjectURL(audioBlob);
-            setAudioURL(audioURL);
-            setAudioChunks([]); // Reset audio chunks
-        };
-        setIsRecording(false);
-    };
+  const { startRecording, stopRecording, mediaBlobUrl, clearBlobUrl } =
+    useReactMediaRecorder({
+      audio: true,
+      onStop: saveRecording,
+    });
 
-    const playRecording = () => {
-        const audio = new Audio(audioURL);
-        audio.play().catch((error) => {
-            console.error("Playback error:", error);
-        });
-    };
+  useEffect(() => {
+    const savedRecordings = localStorage.getItem("recordings");
+    if (savedRecordings) {
+      setRecordings(JSON.parse(savedRecordings));
+    }
+  }, []);
 
-    return (
-        <div className="audio-recorder">
-            <h1>Audio Recorder</h1>
-            <div>
-                <button onClick={isRecording ? stopRecording : startRecording}>
-                    {isRecording ? 'Stop Recording' : 'Start Recording'}
-                </button>
-            </div>
-            {audioURL && (
-                <div>
-                    <h2>Recorded Audio</h2>
-                    <audio controls src={audioURL}></audio>
-                    <button onClick={playRecording}>Play Last Recording</button>
-                </div>
-            )}
-        </div>
+  const playRecording = (base64Audio) => {
+    setPlayingRecording(base64Audio);
+    const audioData = Uint8Array.from(atob(base64Audio), (c) =>
+      c.charCodeAt(0)
     );
+    const audioBlob = new Blob([audioData], { type: "audio/wav" });
+    const audioUrl = URL.createObjectURL(audioBlob);
+
+    if (audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.play();
+    }
+  };
+
+  const stopPlaying = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      setPlayingRecording(null);
+    }
+  };
+
+  const deleteRecording = (id) => {
+    const recordingToDelete = recordings.find((rec) => rec.id === id);
+
+    if (playingRecording === recordingToDelete.base64) {
+      stopPlaying();
+    }
+
+    const updatedRecordings = recordings.filter(
+      (recording) => recording.id !== id
+    );
+    setRecordings(updatedRecordings);
+    localStorage.setItem("recordings", JSON.stringify(updatedRecordings));
+  };
+
+  const handleStartRecording = () => {
+    setIsRecording(true);
+    startRecording();
+  };
+
+  const handleStopRecording = () => {
+    setIsRecording(false);
+    stopRecording();
+    stopPlaying();
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between">
+        <h1 className="text-2xl mb-4">Recordings</h1>
+        <div className="flex gap-x-2">
+          {isRecording ? (
+            <Button onClick={handleStopRecording}>
+              <StopCircle size={20} /> Stop Recording
+            </Button>
+          ) : (
+            <Button onClick={handleStartRecording}>
+              <Mic size={20} /> Start Recording
+            </Button>
+          )}
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {recordings.length === 0 && <p>No recordings found</p>}
+        {recordings.map((recording) => (
+          <Card key={recording.id} className="p-4">
+            <div className="flex justify-center gap-x-2">
+              <Button
+                onClick={() => {
+                  playingRecording === recording.base64
+                    ? stopPlaying()
+                    : playRecording(recording.base64);
+                }}
+              >
+                {playingRecording === recording.base64 ? (
+                  <StopCircle size={20} />
+                ) : (
+                  <Play size={20} />
+                )}
+                {playingRecording === recording.base64 ? "Stop" : "Play"}
+              </Button>
+              <Dialog
+                open={isOpenDeletePopup}
+                onOpenChange={setIsOpenDeletePopup}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="destructive">
+                    <Trash2 size={20} /> Delete
+                  </Button>
+                </DialogTrigger>
+                <DeleteRecordingModal
+                  handleDelete={() => {
+                    deleteRecording(recording.id);
+                  }}
+                  setOpen={setIsOpenDeletePopup}
+                />
+              </Dialog>
+            </div>
+          </Card>
+        ))}
+      </div>
+      <audio ref={audioRef} onEnded={stopPlaying} />
+    </div>
+  );
 };
 
-export default AudioRecorder;
-
+export default AudioPage;

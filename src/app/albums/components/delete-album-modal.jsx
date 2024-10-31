@@ -20,7 +20,7 @@ export function DeleteAlbumModal({ album, setOpen }) {
   const [deleteAlbum, { loading, error }] = useMutation(DELETE_ALBUM, {
     onCompleted: () => {
       setOpen(false);
-      router.replace("/albums"); // Redirect to albums page
+      router.replace("/albums");
     },
     onError: (err) => {
       console.error("Error deleting album:", err);
@@ -40,8 +40,8 @@ export function DeleteAlbumModal({ album, setOpen }) {
       <DialogHeader>
         <DialogTitle>Delete Album</DialogTitle>
         <DialogDescription>
-          Are you sure you want to delete the album titled <strong>{album.title}</strong>?
-          This action cannot be undone.
+          Are you sure you want to delete the album titled{" "}
+          <strong>{album.title}</strong>? This action cannot be undone.
         </DialogDescription>
       </DialogHeader>
       <DialogFooter className="flex justify-end gap-2">

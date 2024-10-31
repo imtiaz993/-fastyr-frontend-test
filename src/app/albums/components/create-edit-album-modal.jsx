@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useMutation, gql } from "@apollo/client";
 
-// Mutation for adding or editing an album
 const ADD_EDIT_ALBUM = gql`
   mutation AddEditAlbum($input: CreateAlbumInput!) {
     createAlbum(input: $input) {
@@ -26,13 +25,13 @@ const ADD_EDIT_ALBUM = gql`
 
 export function CreateEditAlbumModal({ album, setOpen }) {
   const [title, setTitle] = useState(album?.title || "");
-  const [userId, setUserId] = useState(album?.user?.id || ""); // Default user ID
+  const [userId, setUserId] = useState(album?.user?.id || "");
 
   const [addEditAlbum, { loading, error }] = useMutation(ADD_EDIT_ALBUM, {
     onCompleted: () => {
       setTitle("");
       setUserId("");
-      setOpen(false); // Close modal on success
+      setOpen(false);
     },
     onError: (err) => {
       console.error("Error adding/editing album:", err);
@@ -42,7 +41,6 @@ export function CreateEditAlbumModal({ album, setOpen }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure userId is set before submitting
     if (!userId) {
       alert("User ID is required");
       return;
@@ -52,19 +50,19 @@ export function CreateEditAlbumModal({ album, setOpen }) {
       variables: {
         input: {
           title,
-          userId: parseInt(userId, 10), // Ensure userId is a number
+          userId: parseInt(userId, 10),
         },
       },
     });
   };
-s
+
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>{album ? "Edit Album" : "Create New Album"}</DialogTitle>
         <DialogDescription>
-          {album ? "Update" : "Add"} album details here. Click save when you&apos;re
-          done.
+          {album ? "Update" : "Add"} album details here. Click save when
+          you&apos;re done.
         </DialogDescription>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="grid gap-4 py-4">
@@ -92,10 +90,7 @@ s
           />
         </div>
         <DialogFooter>
-          <Button
-            type="submit"
-            disabled={loading || !title || !userId}
-          >
+          <Button type="submit" disabled={loading || !title || !userId}>
             {loading ? "Saving..." : "Save"}
           </Button>
         </DialogFooter>

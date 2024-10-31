@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { Button } from "@/components/ui/button"; // Adjust import path for your Button component
-import { Card } from "@/components/ui/card"; // Adjust import path
+import { Button } from "@/components/ui/button"; 
+import { Card } from "@/components/ui/card"; 
 import Link from "next/link";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
@@ -38,11 +38,9 @@ const AlbumsPage = () => {
         return deleteAlbum({ variables: { id } });
       })
     );
-    // Refresh the data or handle the state update here
   };
 
   const handleImport = (importData) => {
-    // Handle import data validation and updates
     console.log(importData);
   };
   console.log(data?.albums?.data);
@@ -51,7 +49,7 @@ const AlbumsPage = () => {
     if (data && data?.albums)
       return data.albums.data.map((album) => ({
         ...album,
-        select: false, // Add select property for checkbox
+        select: false, 
       }));
     return [];
   }, [data, data?.albums]);
@@ -59,7 +57,7 @@ const AlbumsPage = () => {
   const columns = useMemo(
     () => [
       // {
-      //   id: "select", // Unique ID for the column
+      //   id: "select",
       //   Header: "Select",
       //   accessor: "select",
       //   Cell: ({ row }) => (
@@ -79,12 +77,12 @@ const AlbumsPage = () => {
       //   ),
       // },
       {
-        id: "title", // Unique ID for the column
+        id: "title",
         Header: "Title",
         accessor: "title",
       },
       // {
-      //   id: "actions", // Unique ID for the column
+      //   id: "actions",
       //   Header: "Actions",
       //   accessor: "id",
       //   Cell: ({ value }) => (

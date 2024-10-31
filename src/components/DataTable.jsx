@@ -69,7 +69,6 @@ export function DataTable({
     return <div>Loading...</div>;
   }
 
-  // Show loading or error message if applicable
   if (loading) {
     return <div>Loading...</div>;
   }

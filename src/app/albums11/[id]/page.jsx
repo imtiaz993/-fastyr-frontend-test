@@ -1,7 +1,7 @@
 "use client";
 
 import { gql, useQuery } from "@apollo/client";
-import { Card } from "@/components/ui/card"; // Adjust import path
+import { Card } from "@/components/ui/card"; 
 
 const GET_ALBUM = gql`
   query GetAlbum($id: ID!) {
@@ -22,7 +22,7 @@ const AlbumPage = ({ params }) => {
   if (error) return <p>Error: {error.message}</p>;
 
   const handleDelete = () => {
-    // Implement delete logic here
+   
   };
 
   return (
