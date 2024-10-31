@@ -1,21 +1,46 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   useReactTable,
   getCoreRowModel,
   flexRender,
 } from "@tanstack/react-table";
 import Link from "next/link";
-import { Input } from "@/components/ui/input"; // Assuming you have a reusable Input component
-import Papa from "papaparse"; // For CSV parsing
-import * as XLSX from "xlsx"; // For XLSX parsing
-import { DELETE_ALBUM } from "@/graphql/mutations";
+import { Input } from "@/components/ui/input"; 
+import Papa from "papaparse";
+import * as XLSX from "xlsx"; 
 
 const AlbumsListing = ({ data: dataFromQL }) => {
   const [data, setData] = useState(dataFromQL.albums.data);
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState({});
+  const [columnFilters, setColumnFilters] = useState({});
+  const [debouncedFilters, setDebouncedFilters] = useState({});
   const [previewData, setPreviewData] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const titleInputRef = useRef(null); 
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedFilters(columnFilters);
+      if (titleInputRef.current) {
+        titleInputRef.current.focus(); 
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [columnFilters]);
+
+  const filteredData = useMemo(() => {
+    return data.filter((row) => {
+      return (
+        (!debouncedFilters.title ||
+          row.title.includes(debouncedFilters.title)) &&
+        true
+      );
+    });
+  }, [data, debouncedFilters]);
 
   const columns = useMemo(
     () => [
@@ -40,25 +65,43 @@ const AlbumsListing = ({ data: dataFromQL }) => {
       },
       {
         accessorKey: "title",
-        header: "Title",
-        enableColumnFilter: true,
+        header: ({ column }) => (
+          <div>
+            <Input
+              ref={titleInputRef}
+              placeholder="Search by Title"
+              value={columnFilters.title || ""}
+              onChange={(e) => {
+                const value = e.target.value || undefined;
+                setColumnFilters((prev) => ({
+                  ...prev,
+                  title: value,
+                }));
+              }}
+            />
+            Title
+          </div>
+        ),
+        enableColumnFilter: false,
       },
       {
         id: "id",
-        header: "id",
+        header: "Action",
         cell: ({ row }) => (
-          <Link href={`/albums/${row.original.id}`} className="text-blue-500">
-            View Details
-          </Link>
+          <div className="flex justify-center">
+            <Link href={`/albums/${row.original.id}`} className="text-blue-500">
+              View Details
+            </Link>
+          </div>
         ),
       },
     ],
-    []
+    [columnFilters]
   );
 
   const table = useReactTable({
     columns,
-    data: data,
+    data: filteredData,
     state: {
       globalFilter,
       rowSelection,
@@ -103,8 +146,8 @@ const AlbumsListing = ({ data: dataFromQL }) => {
 
   const validateData = (data) => {
     return data.filter((item) => {
-      // Add your validation logic here, e.g.:
-      return item.title; // Ensure 'title' and 'artist' fields exist
+  
+      return item.title; 
     });
   };
 
@@ -263,12 +306,6 @@ const AlbumsListing = ({ data: dataFromQL }) => {
           </table>
         </div>
       )}
-      {/* <Input
-        placeholder="Search Albums..."
-        value={globalFilter || ""}
-        onChange={(e) => setGlobalFilter(e.target.value)}
-        className="mb-4"
-      /> */}
       {table.getSelectedRowModel().rows.length > 0 && (
         <div className="flex justify-end">
           <button
