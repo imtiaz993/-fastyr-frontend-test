@@ -44,9 +44,7 @@ export function DataTable({
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
-  if (!data || !columns) {
-    return <div>Loading...</div>;
-  }
+
 
   const table = useReactTable({
     data,
@@ -66,6 +64,10 @@ export function DataTable({
       rowSelection,
     },
   });
+
+  if (!data || !columns) {
+    return <div>Loading...</div>;
+  }
 
   // Show loading or error message if applicable
   if (loading) {
