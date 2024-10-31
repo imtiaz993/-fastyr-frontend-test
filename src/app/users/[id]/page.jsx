@@ -1,5 +1,6 @@
 "use client";
 
+import { use } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { RotatingLines } from "react-loader-spinner";
 import { Card } from "@/components/ui/card";
@@ -23,7 +24,7 @@ const GET_USER = gql`
 `;
 
 const UserPage = ({ params }) => {
-  const { id } = params;
+  const { id } = use(params);
   const [isOpenEditPopup, setIsOpenEditPopup] = useState(false);
   const [isOpenDeletePopup, setIsOpenDeletePopup] = useState(false);
 
