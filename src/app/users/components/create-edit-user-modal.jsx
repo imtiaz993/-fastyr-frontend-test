@@ -24,7 +24,7 @@ const ADD_USER = gql`
   }
 `;
 
-export function CreateEditUserModal({ user,setOpen }) {
+export function CreateEditUserModal({ user, setOpen }) {
   const [name, setName] = useState(user?.name);
   const [email, setEmail] = useState(user?.email);
   const [phone, setPhone] = useState(user?.phone);
@@ -38,7 +38,7 @@ export function CreateEditUserModal({ user,setOpen }) {
       setPhone("");
       setUsername("");
       setWebsite("");
-      setOpen(false)
+      setOpen(false);
     },
     onError: (err) => {
       console.error("Error adding user:", err);
@@ -66,7 +66,7 @@ export function CreateEditUserModal({ user,setOpen }) {
         <DialogTitle>{user ? "Edit User" : "Create New User"}</DialogTitle>
         <DialogDescription>
           {user ? "Update" : "Add"} user profile details here. Click save when
-          you're done.
+          you&apos;re done.
         </DialogDescription>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="grid gap-4 py-4">

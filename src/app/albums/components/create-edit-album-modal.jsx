@@ -57,13 +57,13 @@ export function CreateEditAlbumModal({ album, setOpen }) {
       },
     });
   };
-
+s
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>{album ? "Edit Album" : "Create New Album"}</DialogTitle>
         <DialogDescription>
-          {album ? "Update" : "Add"} album details here. Click save when you're
+          {album ? "Update" : "Add"} album details here. Click save when you&apos;re
           done.
         </DialogDescription>
       </DialogHeader>

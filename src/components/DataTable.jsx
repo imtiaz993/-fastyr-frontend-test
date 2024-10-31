@@ -40,14 +40,13 @@ export function DataTable({
   onRowSelect,
   selectedRows,
 }) {
-  if (!data || !columns) {
-    return <div>Loading...</div>;
-  }
-
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+  if (!data || !columns) {
+    return <div>Loading...</div>;
+  }
 
   const table = useReactTable({
     data,
@@ -83,9 +82,8 @@ export function DataTable({
         <Input
           placeholder="Filter emails..."
           // value={table.getColumn("email")?.getFilterValue() ?? ""}
-          onChange={(event) =>{
-
-          }
+          onChange={
+            (event) => {}
             // table.getColumn("email")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
