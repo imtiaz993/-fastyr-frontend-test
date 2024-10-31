@@ -6,14 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useMutation, gql } from "@apollo/client";
+import { DELETE_USER } from "@/graphql/mutations";
+import { useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
-
-const DELETE_USER = gql`
-  mutation DeleteUser($id: ID!) {
-    deleteUser(id: $id)
-  }
-`;
 
 export function DeleteUserModal({ user, setOpen }) {
   const router = useRouter();

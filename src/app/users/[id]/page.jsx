@@ -1,25 +1,13 @@
 "use client";
 
 import { use } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import Spinner from "@/components/spinner";
 import ActionBar from "./components/action-bar";
 import UserDetails from "./components/user-details";
-
-const GET_USER = gql`
-  query GetUser($id: ID!) {
-    user(id: $id) {
-      id
-      name
-      email
-      phone
-      username
-      website
-    }
-  }
-`;
+import { GET_USER } from "@/graphql/queries";
 
 const UserPage = ({ params }) => {
   const { id } = use(params);
@@ -32,8 +20,6 @@ const UserPage = ({ params }) => {
 
   if (loading) return <Spinner />;
   if (error) return <p>Error: {error.message}</p>;
-
-  const handleDelete = () => {};
 
   return (
     <Card className="p-4">

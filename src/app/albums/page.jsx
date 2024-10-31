@@ -1,21 +1,11 @@
 "use client";
 
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { useState } from "react";
 import Spinner from "@/components/spinner";
 import ActionBar from "./components/action-bar";
 import AlbumsListing from "./components/albums-listing";
-
-const GET_ALBUMS = gql`
-  query GetAlbums {
-    albums {
-      data {
-        id
-        title
-      }
-    }
-  }
-`;
+import { GET_ALBUMS } from "@/graphql/queries";
 
 const AlbumPage = () => {
   const [isOpenCreatePopup, setIsOpenCreatePopup] = useState(false);

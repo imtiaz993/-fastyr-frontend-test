@@ -9,33 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useMutation, gql } from "@apollo/client";
-
-const ADD_USER = gql`
-  mutation AddUser($input: CreateUserInput!) {
-    createUser(input: $input) {
-      id
-      name
-      email
-      phone
-      username
-      website
-    }
-  }
-`;
-
-const UPDATE_USER = gql`
-  mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
-    updateUser(id: $id, input: $input) {
-      id
-      name
-      email
-      phone
-      username
-      website
-    }
-  }
-`;
+import { useMutation } from "@apollo/client";
+import { ADD_USER, UPDATE_USER } from "@/graphql/mutations";
 
 export function CreateEditUserModal({ user, setOpen }) {
   const [name, setName] = useState(user?.name || "");
@@ -44,25 +19,29 @@ export function CreateEditUserModal({ user, setOpen }) {
   const [username, setUsername] = useState(user?.username || "");
   const [website, setWebsite] = useState(user?.website || "");
 
-  const [addUser, { loading: loadingAdd, error: errorAdd }] = useMutation(ADD_USER, {
-    onCompleted: (data) => {
-      resetForm();
-      setOpen(false);
-    },
-    onError: (err) => {
-      console.error("Error adding user:", err);
-    },
-  });
+  const [addUser, { loading: loadingAdd, error: errorAdd }] = useMutation(
+    ADD_USER,
+    {
+      onCompleted: (data) => {
+        resetForm();
+        setOpen(false);
+      },
+      onError: (err) => {
+        console.error("Error adding user:", err);
+      },
+    }
+  );
 
-  const [updateUser, { loading: loadingUpdate, error: errorUpdate }] = useMutation(UPDATE_USER, {
-    onCompleted: (data) => {
-      resetForm();
-      setOpen(false);
-    },
-    onError: (err) => {
-      console.error("Error updating user:", err);
-    },
-  });
+  const [updateUser, { loading: loadingUpdate, error: errorUpdate }] =
+    useMutation(UPDATE_USER, {
+      onCompleted: (data) => {
+        resetForm();
+        setOpen(false);
+      },
+      onError: (err) => {
+        console.error("Error updating user:", err);
+      },
+    });
 
   const resetForm = () => {
     setName("");
@@ -100,7 +79,9 @@ export function CreateEditUserModal({ user, setOpen }) {
       </DialogHeader>
       <form onSubmit={handleSubmit} className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="name" className="text-right">Name</Label>
+          <Label htmlFor="name" className="text-right">
+            Name
+          </Label>
           <Input
             id="name"
             value={name}
@@ -109,7 +90,9 @@ export function CreateEditUserModal({ user, setOpen }) {
           />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="email" className="text-right">Email</Label>
+          <Label htmlFor="email" className="text-right">
+            Email
+          </Label>
           <Input
             id="email"
             value={email}
@@ -118,7 +101,9 @@ export function CreateEditUserModal({ user, setOpen }) {
           />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="phone" className="text-right">Phone</Label>
+          <Label htmlFor="phone" className="text-right">
+            Phone
+          </Label>
           <Input
             id="phone"
             value={phone}
@@ -127,7 +112,9 @@ export function CreateEditUserModal({ user, setOpen }) {
           />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="username" className="text-right">Username</Label>
+          <Label htmlFor="username" className="text-right">
+            Username
+          </Label>
           <Input
             id="username"
             value={username}
@@ -136,7 +123,9 @@ export function CreateEditUserModal({ user, setOpen }) {
           />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="website" className="text-right">Website</Label>
+          <Label htmlFor="website" className="text-right">
+            Website
+          </Label>
           <Input
             id="website"
             value={website}
@@ -148,11 +137,12 @@ export function CreateEditUserModal({ user, setOpen }) {
           <Button
             type="submit"
             disabled={
-              (loadingAdd || loadingUpdate) || 
-              !name || 
-              !email || 
-              !username || 
-              !phone || 
+              loadingAdd ||
+              loadingUpdate ||
+              !name ||
+              !email ||
+              !username ||
+              !phone ||
               !website
             }
           >
@@ -161,7 +151,9 @@ export function CreateEditUserModal({ user, setOpen }) {
         </DialogFooter>
       </form>
       {(errorAdd || errorUpdate) && (
-        <p className="text-red-500">Error: {errorAdd?.message || errorUpdate?.message}</p>
+        <p className="text-red-500">
+          Error: {errorAdd?.message || errorUpdate?.message}
+        </p>
       )}
     </DialogContent>
   );

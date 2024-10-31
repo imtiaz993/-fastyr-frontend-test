@@ -9,28 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useMutation, gql } from "@apollo/client";
-
-const ADD_ALBUM = gql`
-  mutation AddAlbum($input: CreateAlbumInput!) {
-    createAlbum(input: $input) {
-      id
-      title
-      user {
-        id
-      }
-    }
-  }
-`;
-
-const UPDATE_ALBUM = gql`
-  mutation UpdateAlbum($id: ID!, $input: UpdateAlbumInput!) {
-    updateAlbum(id: $id, input: $input) {
-      id
-      title
-    }
-  }
-`;
+import { useMutation } from "@apollo/client";
+import { ADD_ALBUM, UPDATE_ALBUM } from "@/graphql/mutations";
 
 export function CreateEditAlbumModal({ album, setOpen }) {
   const [title, setTitle] = useState(album?.title || "");

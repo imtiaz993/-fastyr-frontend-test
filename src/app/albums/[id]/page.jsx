@@ -1,25 +1,13 @@
 "use client";
 
 import { use } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import Spinner from "@/components/spinner";
 import AlbumDetails from "./components/album-details";
 import ActionBar from "./components/action-bar";
-
-const GET_ALBUM = gql`
-  query GetAlbum($id: ID!) {
-    album(id: $id) {
-      id
-      title
-      user {
-        id
-        name
-      }
-    }
-  }
-`;
+import { GET_ALBUM } from "@/graphql/queries";
 
 const AlbumPage = ({ params }) => {
   const { id } = use(params);

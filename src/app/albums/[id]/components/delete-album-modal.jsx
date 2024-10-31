@@ -6,14 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useMutation, gql } from "@apollo/client";
+import { DELETE_ALBUM } from "@/graphql/mutations";
+import { useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
-
-const DELETE_ALBUM = gql`
-  mutation DeleteAlbum($id: ID!) {
-    deleteAlbum(id: $id)
-  }
-`;
 
 export function DeleteAlbumModal({ album, setOpen }) {
   const router = useRouter();

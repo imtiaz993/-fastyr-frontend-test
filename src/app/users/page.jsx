@@ -1,22 +1,11 @@
 "use client";
 
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { useState } from "react";
 import ActionBar from "./components/action-bar";
 import UserListing from "./components/user-listing";
 import Spinner from "@/components/spinner";
-
-const GET_USERS = gql`
-  query GetUsers {
-    users {
-      data {
-        id
-        name
-        email
-      }
-    }
-  }
-`;
+import { GET_USERS } from "@/graphql/queries";
 
 const UsersPage = () => {
   const [isOpenCreatePopup, setIsOpenCreatePopup] = useState(false);
