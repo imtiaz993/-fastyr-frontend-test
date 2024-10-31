@@ -1,13 +1,20 @@
+// AudioPageContainer.js
+
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { useReactMediaRecorder } from "react-media-recorder";
+import dynamic from "next/dynamic";
 import { encode } from "base64-arraybuffer";
 import { Mic, StopCircle, Play, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DeleteRecordingModal } from "./components/delete-audio-modal";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+
+const useReactMediaRecorder = dynamic(
+  () => import("react-media-recorder").then((mod) => mod.useReactMediaRecorder),
+  { ssr: false }
+);
 
 const AudioPage = () => {
   const [recordings, setRecordings] = useState([]);

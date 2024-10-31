@@ -2,13 +2,11 @@
 
 import { use } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { RotatingLines } from "react-loader-spinner";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { CreateEditUserModal } from "../components/create-edit-user-modal";
 import { useState } from "react";
-import { DeleteUserModal } from "../components/delete-user-modal";
+import Spinner from "@/components/spinner";
+import ActionBar from "./components/action-bar";
+import UserDetails from "./components/user-details";
 
 const GET_USER = gql`
   query GetUser($id: ID!) {
@@ -32,52 +30,21 @@ const UserPage = ({ params }) => {
     variables: { id },
   });
 
-  if (loading)
-    return (
-      <div className="mt-20 flex justify-center">
-        <RotatingLines
-          visible={true}
-          height="96"
-          width="96"
-          strokeColor="black"
-          strokeWidth="2"
-          animationDuration="0.75"
-          ariaLabel="rotating-lines-loading"
-          wrapperStyle={{}}
-          wrapperClass=""
-        />
-      </div>
-    );
+  if (loading) return <Spinner />;
   if (error) return <p>Error: {error.message}</p>;
 
   const handleDelete = () => {};
 
   return (
     <Card className="p-4">
-      <div className="flex flex-col-reverse md:flex-row justify-between">
-        <h1 className="text-2xl mb-2">{data.user.name}</h1>
-        <div className="flex gap-x-2 mb-5 md:mb-0">
-          <Dialog open={isOpenEditPopup} onOpenChange={setIsOpenEditPopup}>
-            <DialogTrigger asChild>
-              <Button variant="outline">Edit User</Button>
-            </DialogTrigger>
-            <CreateEditUserModal
-              user={data.user}
-              setOpen={setIsOpenEditPopup}
-            />
-          </Dialog>
-          <Dialog open={isOpenDeletePopup} onOpenChange={setIsOpenDeletePopup}>
-            <DialogTrigger asChild>
-              <Button variant="destructive"> Delete User</Button>
-            </DialogTrigger>
-            <DeleteUserModal user={data.user} setOpen={setIsOpenDeletePopup} />
-          </Dialog>
-        </div>
-      </div>
-      <p>Email: {data.user.email}</p>
-      <p>Username: {data.user.username}</p>
-      <p>Phone: {data.user.phone}</p>
-      <p>Website: {data.user.website}</p>
+      <ActionBar
+        data={data}
+        isOpenEditPopup={isOpenEditPopup}
+        setIsOpenEditPopup={setIsOpenEditPopup}
+        isOpenDeletePopup={isOpenDeletePopup}
+        setIsOpenDeletePopup={setIsOpenDeletePopup}
+      />
+      <UserDetails data={data} />
     </Card>
   );
 };

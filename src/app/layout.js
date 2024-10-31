@@ -1,10 +1,10 @@
 "use client";
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { ApolloProvider, client } from "../lib/apolloClient";
-import "./globals.css";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import Header from "@/components/ui/header";
+import { ApolloProvider, client } from "../lib/apolloClient";
+import "./globals.css";
 
 export default function RootLayout({ children }) {
   return (
