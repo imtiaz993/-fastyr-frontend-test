@@ -51,9 +51,9 @@ const AlbumPage = ({ params }) => {
 
   return (
     <Card className="p-4">
-      <div className="flex justify-between">
+      <div className="flex flex-col-reverse md:flex-row justify-between">
         <h1 className="text-2xl mb-2">Album: {data.album.title}</h1>
-        <div className="flex gap-x-2">
+        <div className="flex gap-x-2 mb-5 md:mb-0">
           <Dialog open={isOpenEditPopup} onOpenChange={setIsOpenEditPopup}>
             <DialogTrigger asChild>
               <Button variant="outline">Edit Album</Button>
@@ -67,7 +67,10 @@ const AlbumPage = ({ params }) => {
             <DialogTrigger asChild>
               <Button variant="destructive">Delete Album</Button>
             </DialogTrigger>
-            <DeleteAlbumModal album={data.album} setOpen={setIsOpenDeletePopup} />
+            <DeleteAlbumModal
+              album={data.album}
+              setOpen={setIsOpenDeletePopup}
+            />
           </Dialog>
         </div>
       </div>
