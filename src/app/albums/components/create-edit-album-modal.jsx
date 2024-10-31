@@ -28,9 +28,6 @@ const UPDATE_ALBUM = gql`
     updateAlbum(id: $id, input: $input) {
       id
       title
-      user {
-        id
-      }
     }
   }
 `;
@@ -70,10 +67,11 @@ export function CreateEditAlbumModal({ album, setOpen }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!userId) {
-      alert("User ID is required");
-      return;
+    if (!album) {
+      if (!userId) {
+        alert("User ID is required");
+        return;
+      }
     }
 
     const input = {
@@ -109,22 +107,26 @@ export function CreateEditAlbumModal({ album, setOpen }) {
             className="col-span-3"
           />
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="userId" className="text-right">
-            User ID
-          </Label>
-          <Input
-            id="userId"
-            type="number"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            className="col-span-3"
-          />
-        </div>
+        {!album && (
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="userId" className="text-right">
+              User ID
+            </Label>
+            <Input
+              id="userId"
+              type="number"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              className="col-span-3"
+            />
+          </div>
+        )}
         <DialogFooter>
           <Button
             type="submit"
-            disabled={loadingAdd || loadingUpdate || !title || !userId}
+            disabled={
+              loadingAdd || loadingUpdate || !title || (!userId && !album)
+            }
           >
             {loadingAdd || loadingUpdate ? "Saving..." : "Save"}
           </Button>
