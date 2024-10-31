@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input"; // Assuming you have a reusable Input component
 import Papa from "papaparse"; // For CSV parsing
 import * as XLSX from "xlsx"; // For XLSX parsing
+import { DELETE_ALBUM } from "@/graphql/mutations";
 
 const AlbumsListing = ({ data: dataFromQL }) => {
   const [data, setData] = useState(dataFromQL.albums.data);
@@ -109,17 +110,87 @@ const AlbumsListing = ({ data: dataFromQL }) => {
 
   const handleFinalizeImport = () => {
     console.log("Finalizing import with data:", previewData);
-    setData([...previewData, ...data]);
-    // Here you can call an API to save the data
+    bulkUploadAlbums(data);
     setPreviewData([]);
-    setSelectedFile(null); // Clear the selected file state
+    setSelectedFile(null);
     document.getElementById("fileInput").value = "";
   };
 
-  const handleBulkDelete = () => {
+  const bulkUploadAlbums = async (albums) => {
+    const createAlbumMutation = `
+   mutation CreateAlbum($input: CreateAlbumInput!) {
+  createAlbum(input: $input) {
+    id
+    title
+     user {
+            id
+          }
+  }
+}
+    `;
+
+    for (const album of albums) {
+      try {
+        const input = {
+          title: album.title,
+          userId: 1,
+        };
+        const response = await fetch("https://graphqlzero.almansi.me/api", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: createAlbumMutation,
+            variables: { input },
+          }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          console.log("Uploaded album:", result.data.createAlbum);
+        } else {
+          console.error("Error uploading album:", result.errors);
+        }
+      } catch (error) {
+        console.error("Network error:", error);
+      }
+    }
+
+    setMessage("Upload complete!");
+  };
+
+  const handleBulkDelete = async () => {
     const selectedRows = table.getSelectedRowModel().rows;
     const selectedRowIds = selectedRows.map((row) => row.original.id);
-    console.log(selectedRowIds);
+    const deletePostMutation = `
+    mutation DeletePost($id: ID!) {
+      deletePost(id: $id)
+    }
+  `;
+
+    try {
+      const responses = await Promise.all(
+        selectedRowIds.map(async (id) => {
+          const response = await fetch("https://graphqlzero.almansi.me/api", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              query: deletePostMutation,
+              variables: { id },
+            }),
+          });
+          return response.json();
+        })
+      );
+
+      console.log("Delete responses:", responses);
+    } catch (error) {
+      console.error("Error deleting posts:", error);
+    }
   };
 
   return (
@@ -150,7 +221,7 @@ const AlbumsListing = ({ data: dataFromQL }) => {
           <table className="min-w-full border-collapse border border-gray-200">
             <thead>
               <tr>
-                {columns.slice(0, 1).map((column) => (
+                {columns.slice(1, 2).map((column) => (
                   <th key={column.id} className="border border-gray-300 p-2">
                     {column.header}
                   </th>
@@ -161,7 +232,7 @@ const AlbumsListing = ({ data: dataFromQL }) => {
             <tbody>
               {previewData.map((row, index) => (
                 <tr key={index}>
-                  {columns.slice(0, 1).map((column) => (
+                  {columns.slice(1, 2).map((column) => (
                     <td key={column.id} className="border border-gray-300 p-2">
                       <Input
                         value={row[column.accessorKey]}
@@ -192,12 +263,12 @@ const AlbumsListing = ({ data: dataFromQL }) => {
           </table>
         </div>
       )}
-      <Input
+      {/* <Input
         placeholder="Search Albums..."
         value={globalFilter || ""}
         onChange={(e) => setGlobalFilter(e.target.value)}
         className="mb-4"
-      />
+      /> */}
       {table.getSelectedRowModel().rows.length > 0 && (
         <div className="flex justify-end">
           <button
@@ -205,7 +276,6 @@ const AlbumsListing = ({ data: dataFromQL }) => {
             className="mb-4 bg-red-500 text-white p-2 rounded"
           >
             Delete Selected
-            
           </button>
         </div>
       )}
